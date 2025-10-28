@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { SlidersHorizontal, MapPin, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
+import { products } from '@/lib/db';
 import {
   Select,
   SelectContent,
@@ -11,19 +13,22 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-const results = [
-  { id: 1, title: 'iPhone 13 Pro Max 256GB', price: '$699', image: '📱', distance: '2km', time: '2h ago', seller: 'John D.' },
-  { id: 2, title: 'iPhone 13 Pro 128GB - Mint', price: '$649', image: '📱', distance: '3km', time: '5h ago', seller: 'Sarah M.' },
-  { id: 3, title: 'iPhone 13 Pro 256GB Blue', price: '$720', image: '📱', distance: '1km', time: '1d ago', seller: 'Mike R.' },
-  { id: 4, title: 'iPhone 13 Pro - Like New', price: '$680', image: '📱', distance: '4km', time: '2d ago', seller: 'Emma L.' },
-  { id: 5, title: 'iPhone 13 Pro Gold 512GB', price: '$799', image: '📱', distance: '5km', time: '3d ago', seller: 'Alex K.' },
-  { id: 6, title: 'iPhone 13 Pro Green', price: '$660', image: '📱', distance: '2km', time: '1w ago', seller: 'Lisa P.' },
-];
 
 export default function Results() {
+  const location = useLocation();
+  const { aiAnalysis } = location.state || {};
   const breakpoint = useBreakpoint();
   const isDesktop = breakpoint === 'desktop' || breakpoint === 'wide';
   const [showFilters, setShowFilters] = useState(isDesktop);
+
+  // Filter products based on the AI analysis
+  const similarProducts = aiAnalysis
+    ? products.filter(p => 
+        p.category === aiAnalysis.category && 
+        p.name.toLowerCase().includes(aiAnalysis.name.toLowerCase().split(' ')[0]) &&
+        p.name !== aiAnalysis.name
+      )
+    : products;
 
   const FiltersSidebar = () => (
     <div className={`${isDesktop ? '' : 'glass-card p-4 mb-4'} space-y-4`}>
@@ -65,20 +70,6 @@ export default function Results() {
         </Select>
       </div>
 
-      <div>
-        <label className="text-sm font-medium mb-2 block">Posted</label>
-        <Select>
-          <SelectTrigger className="bg-card/50">
-            <SelectValue placeholder="Any time" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="today">Today</SelectItem>
-            <SelectItem value="week">This week</SelectItem>
-            <SelectItem value="month">This month</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
       <Button className="w-full bg-primary hover:bg-primary-glow">
         Apply Filters
       </Button>
@@ -92,8 +83,8 @@ export default function Results() {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-3xl font-bold mb-1">Search Results</h1>
-              <p className="text-muted-foreground">Found {results.length} items nearby</p>
+              <h1 className="text-3xl font-bold mb-1">Results for "{aiAnalysis?.name || 'Items'}"</h1>
+              <p className="text-muted-foreground">Found {similarProducts.length} similar items</p>
             </div>
             {!isDesktop && (
               <Button
@@ -116,7 +107,6 @@ export default function Results() {
                 <SelectItem value="distance">Nearest First</SelectItem>
                 <SelectItem value="price-low">Price: Low to High</SelectItem>
                 <SelectItem value="price-high">Price: High to Low</SelectItem>
-                <SelectItem value="recent">Most Recent</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -141,28 +131,28 @@ export default function Results() {
 
             {/* Results Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-              {results.map((item) => (
+              {similarProducts.map((item, index) => (
                 <button
-                  key={item.id}
+                  key={index}
                   className="glass-card-hover p-4 text-left"
                 >
                   <div className="aspect-square rounded-xl bg-secondary/50 flex items-center justify-center mb-4 overflow-hidden">
-                    <span className="text-6xl">{item.image}</span>
+                    <span className="text-6xl">{item.category === 'Electronics' ? '📱' : '👟'}</span>
                   </div>
                   
-                  <h3 className="font-semibold mb-2 line-clamp-2">{item.title}</h3>
-                  <p className="text-2xl font-bold text-primary mb-3">{item.price}</p>
+                  <h3 className="font-semibold mb-2 line-clamp-2">{item.name}</h3>
+                  <p className="text-2xl font-bold text-primary mb-3">${item.buyerPrice}</p>
                   
                   <div className="space-y-1 text-sm text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <MapPin className="h-4 w-4" />
-                      <span>{item.distance} away</span>
+                      <span>{Math.floor(Math.random() * 10) + 1}km away</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="h-4 w-4" />
-                      <span>{item.time}</span>
+                      <span>{Math.floor(Math.random() * 24) + 1}h ago</span>
                     </div>
-                    <p className="text-foreground">Seller: {item.seller}</p>
+                    <p className="text-foreground">Seller: Random Seller</p>
                   </div>
                 </button>
               ))}
