@@ -51,11 +51,11 @@ export default function Home() {
                   onKeyDown={(e) => e.key === 'Enter' && navigate('/results')}
                 />
               </div>
-              <Button
-                size="lg"
-                className="bg-primary hover:bg-primary-glow shadow-lg shadow-primary/30"
-                onClick={() => navigate('/camera')}
-              >
+          <Button
+            size="lg"
+            className="bg-primary hover:bg-primary-glow shadow-lg shadow-primary/30"
+            onClick={() => navigate('/camera', { state: { action: 'buy' } })}
+          >
                 <Camera className="h-5 w-5" />
               </Button>
             </div>

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { useBreakpoint } from "@/hooks/useBreakpoint";
+import Welcome from "./pages/Welcome";
 import Home from "./pages/Home";
 import Camera from "./pages/Camera";
 import Results from "./pages/Results";
@@ -24,7 +25,8 @@ function AppContent() {
       <Navigation />
       <main className={`flex-1 ${isDesktop ? 'ml-64' : ''}`}>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Welcome />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/camera" element={<Camera />} />
           <Route path="/results" element={<Results />} />
           <Route path="/listing" element={<Listing />} />

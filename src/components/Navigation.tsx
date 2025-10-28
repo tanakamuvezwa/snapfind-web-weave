@@ -4,7 +4,7 @@ import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { to: '/', icon: Home, label: 'Home' },
+  { to: '/home', icon: Home, label: 'Home' },
   { to: '/camera', icon: Camera, label: 'Capture' },
   { to: '/results', icon: Search, label: 'Results' },
   { to: '/listing', icon: PlusCircle, label: 'List Item' },

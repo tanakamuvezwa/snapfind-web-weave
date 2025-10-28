@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Upload, X, DollarSign } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Upload, X, DollarSign, Sparkles, CheckCircle } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -13,10 +14,32 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+type AIAnalysis = {
+  category: string;
+  confidence: number;
+  suggestedPrice: string;
+  condition: string;
+  description: string;
+};
+
 export default function Listing() {
   const breakpoint = useBreakpoint();
   const isDesktop = breakpoint === 'desktop' || breakpoint === 'wide';
-  const [images, setImages] = useState<string[]>([]);
+  const location = useLocation();
+  const aiData = (location.state as { image?: string; aiAnalysis?: AIAnalysis }) || {};
+  
+  const [images, setImages] = useState<string[]>(aiData.image ? [aiData.image] : []);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState(aiData.aiAnalysis?.description || '');
+  const [price, setPrice] = useState(aiData.aiAnalysis?.suggestedPrice?.replace('$', '') || '');
+  const [category, setCategory] = useState(aiData.aiAnalysis?.category.toLowerCase() || '');
+  const [condition, setCondition] = useState(aiData.aiAnalysis?.condition.toLowerCase().replace(' ', '-') || '');
+
+  useEffect(() => {
+    if (aiData.aiAnalysis) {
+      toast.success('AI pre-filled your listing!', { icon: '✨' });
+    }
+  }, []);
 
   const handleAddImage = () => {
     setImages([...images, `https://images.unsplash.com/photo-${Date.now()}?w=400&h=400&fit=crop`]);
@@ -34,9 +57,45 @@ export default function Listing() {
   return (
     <div className="min-h-screen pb-20 lg:pb-8 px-4 pt-8 max-w-6xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">List an Item</h1>
-        <p className="text-muted-foreground">Fill in the details to create your listing</p>
+        <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
+          List an Item
+          {aiData.aiAnalysis && <Sparkles className="h-6 w-6 text-primary animate-pulse" />}
+        </h1>
+        <p className="text-muted-foreground">
+          {aiData.aiAnalysis 
+            ? 'AI has pre-filled your listing - review and publish!' 
+            : 'Fill in the details to create your listing'}
+        </p>
       </div>
+
+      {aiData.aiAnalysis && (
+        <div className="glass-card p-4 mb-6 bg-primary/10">
+          <div className="flex items-start gap-3">
+            <CheckCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-semibold mb-1">AI Analysis Applied</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Category</p>
+                  <p className="font-medium">{aiData.aiAnalysis.category}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Price</p>
+                  <p className="font-medium text-primary">{aiData.aiAnalysis.suggestedPrice}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Condition</p>
+                  <p className="font-medium">{aiData.aiAnalysis.condition}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Confidence</p>
+                  <p className="font-medium">{aiData.aiAnalysis.confidence}%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit}>
         <div className={`grid gap-6 ${isDesktop ? 'grid-cols-2' : 'grid-cols-1'}`}>
@@ -72,11 +131,10 @@ export default function Listing() {
               <p className="text-xs text-muted-foreground">Add up to 6 photos</p>
             </div>
 
-            {/* Category & Condition */}
             <div className="glass-card p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">Category</label>
-                <Select>
+                <Select value={category} onValueChange={setCategory}>
                   <SelectTrigger className="bg-card/50">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
@@ -92,7 +150,7 @@ export default function Listing() {
 
               <div>
                 <label className="block text-sm font-medium mb-2">Condition</label>
-                <Select>
+                <Select value={condition} onValueChange={setCondition}>
                   <SelectTrigger className="bg-card/50">
                     <SelectValue placeholder="Select condition" />
                   </SelectTrigger>
@@ -109,13 +167,14 @@ export default function Listing() {
 
           {/* Right Column / Bottom Section */}
           <div className="space-y-6">
-            {/* Basic Info */}
             <div className="glass-card p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">Title</label>
                 <Input
                   placeholder="iPhone 13 Pro Max 256GB"
                   className="bg-card/50"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
                   required
                 />
               </div>
@@ -126,18 +185,24 @@ export default function Listing() {
                   placeholder="Describe your item..."
                   rows={6}
                   className="bg-card/50 resize-none"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Price</label>
+                <label className="block text-sm font-medium mb-2">
+                  Price {aiData.aiAnalysis && <span className="text-xs text-primary">(AI suggested)</span>}
+                </label>
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     type="number"
                     placeholder="699"
                     className="pl-10 bg-card/50"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
                     required
                   />
                 </div>

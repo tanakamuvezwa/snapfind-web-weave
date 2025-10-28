@@ -1,4 +1,4 @@
-import { Search, Plus, CheckCircle, Clock } from 'lucide-react';
+import { Search, Plus, Flame, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { toast } from 'sonner';
@@ -61,7 +61,7 @@ export default function Wanted() {
                     </p>
                     <div className="flex items-center gap-4 text-sm">
                       <div className="flex items-center gap-1 text-primary">
-                        <CheckCircle className="h-4 w-4" />
+                        <Flame className="h-4 w-4" />
                         <span className="font-medium">{request.matches} matches</span>
                       </div>
                       <div className="flex items-center gap-1 text-muted-foreground">
