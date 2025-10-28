@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { SlidersHorizontal, MapPin, Clock } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { SlidersHorizontal, MapPin, Clock, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
@@ -12,10 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 
 export default function Results() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { aiAnalysis } = location.state || {};
   const breakpoint = useBreakpoint();
   const isDesktop = breakpoint === 'desktop' || breakpoint === 'wide';
@@ -82,9 +84,14 @@ export default function Results() {
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
+            <div className='flex items-center gap-4'>
+            <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
             <div>
               <h1 className="text-3xl font-bold mb-1">Results for "{aiAnalysis?.name || 'Items'}"</h1>
               <p className="text-muted-foreground">Found {similarProducts.length} similar items</p>
+            </div>
             </div>
             {!isDesktop && (
               <Button
@@ -129,34 +136,74 @@ export default function Results() {
             {/* Mobile Filters */}
             {!isDesktop && showFilters && <FiltersSidebar />}
 
-            {/* Results Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-              {similarProducts.map((item, index) => (
-                <button
-                  key={index}
-                  className="glass-card-hover p-4 text-left"
-                >
-                  <div className="aspect-square rounded-xl bg-secondary/50 flex items-center justify-center mb-4 overflow-hidden">
-                    <span className="text-6xl">{item.category === 'Electronics' ? '📱' : '👟'}</span>
-                  </div>
-                  
-                  <h3 className="font-semibold mb-2 line-clamp-2">{item.name}</h3>
-                  <p className="text-2xl font-bold text-primary mb-3">${item.buyerPrice}</p>
-                  
-                  <div className="space-y-1 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      <span>{Math.floor(Math.random() * 10) + 1}km away</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      <span>{Math.floor(Math.random() * 24) + 1}h ago</span>
-                    </div>
-                    <p className="text-foreground">Seller: Random Seller</p>
-                  </div>
-                </button>
-              ))}
+            <Tabs defaultValue="sellers">
+  <TabsList className='mb-4'>
+    <TabsTrigger value="sellers">Seller Ads</TabsTrigger>
+    <TabsTrigger value="buyers">Buyer Ads</TabsTrigger>
+  </TabsList>
+  <TabsContent value="sellers">
+    {/* Results Grid */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+      {similarProducts.map((item, index) => (
+        <button
+          key={index}
+          className="glass-card-hover p-4 text-left"
+        >
+          <div className="aspect-square rounded-xl bg-secondary/50 flex items-center justify-center mb-4 overflow-hidden">
+            <span className="text-6xl">{item.category === 'Electronics' ? '📱' : '👟'}</span>
+          </div>
+          
+          <h3 className="font-semibold mb-2 line-clamp-2">{item.name}</h3>
+          <p className="text-2xl font-bold text-primary mb-3">${item.sellerPrice}</p>
+          
+          <div className="space-y-1 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              <span>{Math.floor(Math.random() * 10) + 1}km away</span>
             </div>
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              <span>{Math.floor(Math.random() * 24) + 1}h ago</span>
+            </div>
+            <p className="text-foreground">Seller: Random Seller</p>
+          </div>
+        </button>
+      ))}
+    </div>
+  </TabsContent>
+  <TabsContent value="buyers">
+    {/* Results Grid */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+      {similarProducts.map((item, index) => (
+        <button
+          key={index}
+          className="glass-card-hover p-4 text-left"
+        >
+          <div className="aspect-square rounded-xl bg-secondary/50 flex items-center justify-center mb-4 overflow-hidden">
+            <span className="text-6xl">{item.category === 'Electronics' ? '📱' : '👟'}</span>
+          </div>
+          
+          <h3 className="font-semibold mb-2 line-clamp-2">{item.name}</h3>
+          <p className="text-2xl font-bold text-primary mb-3">${item.buyerPrice}</p>
+          
+          <div className="space-y-1 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              <span>{Math.floor(Math.random() * 10) + 1}km away</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              <span>{Math.floor(Math.random() * 24) + 1}h ago</span>
+            </div>
+            <p className="text-foreground">Buyer: Random Buyer</p>
+          </div>
+        </button>
+      ))}
+    </div>
+  </TabsContent>
+</Tabs>
+
+
           </div>
         </div>
       </div>

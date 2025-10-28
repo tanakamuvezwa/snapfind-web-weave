@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Upload, X, DollarSign, Sparkles, CheckCircle } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Upload, X, DollarSign, Sparkles, CheckCircle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -24,6 +24,7 @@ type AIAnalysis = {
 
 export default function Listing() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { image, aiAnalysis } = (location.state as { image?: string; aiAnalysis?: AIAnalysis }) || {};
 
   const [images, setImages] = useState<string[]>(image ? [image] : []);
@@ -58,16 +59,21 @@ export default function Listing() {
 
   return (
     <div className="min-h-screen pb-20 lg:pb-8 px-4 pt-8 max-w-6xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
-          List an Item
-          {aiAnalysis && <Sparkles className="h-6 w-6 text-primary animate-pulse" />}
-        </h1>
-        <p className="text-muted-foreground">
-          {aiAnalysis 
-            ? 'AI has pre-filled your listing - review and publish!' 
-            : 'Fill in the details to create your listing'}
-        </p>
+      <div className="mb-8 flex items-center gap-4">
+        <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <div>
+          <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
+            List an Item
+            {aiAnalysis && <Sparkles className="h-6 w-6 text-primary animate-pulse" />}
+          </h1>
+          <p className="text-muted-foreground">
+            {aiAnalysis 
+              ? 'AI has pre-filled your listing - review and publish!' 
+              : 'Fill in the details to create your listing'}
+          </p>
+        </div>
       </div>
 
       {aiAnalysis && (

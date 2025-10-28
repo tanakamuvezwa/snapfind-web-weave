@@ -1,4 +1,4 @@
-import { Search, Camera, TrendingUp } from 'lucide-react';
+import { Search, Camera, TrendingUp, User, LogIn, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,26 +23,48 @@ const recentListings = [
 
 export default function Home() {
   const navigate = useNavigate();
+  const user = null; // Placeholder for user state
 
   return (
     <div className="min-h-screen pb-20 lg:pb-8">
+      {/* Header with User Actions */}
+      <header className="absolute top-0 left-0 right-0 p-4 z-10">
+        <div className="max-w-7xl mx-auto flex justify-end items-center">
+          {user ? (
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="icon" onClick={() => navigate('/user-panel')}>
+                <User className="h-5 w-5" />
+              </Button>
+              <Button variant="ghost" size="icon">
+                <LogOut className="h-5 w-5" />
+              </Button>
+            </div>
+          ) : (
+            <Button variant="ghost" onClick={() => navigate('/sign-in')}>
+              <LogIn className="h-5 w-5 mr-2" />
+              Sign In
+            </Button>
+          )}
+        </div>
+      </header>
+
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-transparent" />
-        <div className="relative px-4 pt-8 pb-12 lg:pt-16 lg:pb-20 max-w-7xl mx-auto">
+        <div className="relative px-4 pt-24 pb-12 lg:pt-32 lg:pb-20 max-w-7xl mx-auto">
           <div className="text-center lg:text-left lg:max-w-2xl">
             <h1 className="text-4xl lg:text-6xl font-bold mb-4 animate-fade-in-up">
-              Find Anything,{' '}
+              Snap to Find,{' '}
               <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-                Snap & Search
+                Snap to Buy
               </span>
             </h1>
             <p className="text-lg text-muted-foreground mb-8 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
               Visual search for local classifieds. Take a photo, find it nearby.
             </p>
 
-            {/* Search Bar */}
-            <div className="flex gap-3 mb-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+            {/* Search and Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
@@ -51,13 +73,24 @@ export default function Home() {
                   onKeyDown={(e) => e.key === 'Enter' && navigate('/results')}
                 />
               </div>
-          <Button
-            size="lg"
-            className="bg-primary hover:bg-primary-glow shadow-lg shadow-primary/30"
-            onClick={() => navigate('/camera', { state: { action: 'buy' } })}
-          >
-                <Camera className="h-5 w-5" />
-              </Button>
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  size="lg"
+                  className="bg-primary hover:bg-primary-glow shadow-lg shadow-primary/30"
+                  onClick={() => navigate('/camera', { state: { action: 'buy' } })}
+                >
+                  <Camera className="h-5 w-5 mr-2" />
+                  Snap to Buy
+                </Button>
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  onClick={() => navigate('/camera', { state: { action: 'sell' } })}
+                >
+                  <Camera className="h-5 w-5 mr-2" />
+                  Snap to Sell
+                </Button>
+              </div>
             </div>
           </div>
         </div>
