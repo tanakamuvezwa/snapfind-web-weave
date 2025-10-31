@@ -2,23 +2,24 @@ import { Search, Camera, TrendingUp, User, LogIn, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import '../styles/home.css';
 
 const categories = [
-  { name: 'Electronics', icon: '📱', color: 'from-blue-500 to-cyan-500' },
-  { name: 'Furniture', icon: '🛋️', color: 'from-amber-500 to-orange-500' },
-  { name: 'Vehicles', icon: '🚗', color: 'from-red-500 to-pink-500' },
-  { name: 'Clothing', icon: '👕', color: 'from-purple-500 to-indigo-500' },
-  { name: 'Books', icon: '📚', color: 'from-green-500 to-emerald-500' },
-  { name: 'Sports', icon: '⚽', color: 'from-yellow-500 to-amber-500' },
+  { name: 'Electronics', icon: '📱' },
+  { name: 'Furniture', icon: '🛋️' },
+  { name: 'Vehicles', icon: '🚗' },
+  { name: 'Clothing', icon: '👕' },
+  { name: 'Books', icon: '📚' },
+  { name: 'Sports', icon: '⚽' },
 ];
 
-const recentListings = [
-  { id: 1, title: 'iPhone 13 Pro', price: '$699', image: '📱', location: '2km away', category: 'Electronics' },
-  { id: 2, title: 'Leather Sofa', price: '$350', image: '🛋️', location: '5km away', category: 'Furniture' },
-  { id: 3, title: 'Mountain Bike', price: '$450', image: '🚴', location: '1km away', category: 'Sports' },
-  { id: 4, title: 'MacBook Air', price: '$899', image: '💻', location: '3km away', category: 'Electronics' },
-  { id: 5, title: 'Dining Table', price: '$200', image: '🪑', location: '4km away', category: 'Furniture' },
-  { id: 6, title: 'Nike Sneakers', price: '$120', image: '👟', location: '2km away', category: 'Clothing' },
+const floatingItems = [
+  { id: 1, title: 'iPhone 13 Pro', price: '$699', image: '📱', style: { top: '10%', left: '5%', animation: 'float 6s ease-in-out infinite' } },
+  { id: 2, title: 'Leather Sofa', price: '$350', image: '🛋️', style: { top: '30%', left: '80%', animation: 'float 7s ease-in-out infinite' } },
+  { id: 3, title: 'Mountain Bike', price: '$450', image: '🚴', style: { top: '70%', left: '15%', animation: 'float 8s ease-in-out infinite' } },
+  { id: 4, title: 'MacBook Air', price: '$899', image: '💻', style: { top: '50%', left: '50%', animation: 'float 5s ease-in-out infinite' } },
+  { id: 5, title: 'Dining Table', price: '$200', image: '🪑', style: { top: '85%', left: '60%', animation: 'float 9s ease-in-out infinite' } },
+  { id: 6, title: 'Nike Sneakers', price: '$120', image: '👟', style: { top: '5%', left: '90%', animation: 'float 6s ease-in-out infinite' } },
 ];
 
 export default function Home() {
@@ -26,21 +27,21 @@ export default function Home() {
   const user = null; // Placeholder for user state
 
   return (
-    <div className="min-h-screen pb-20 lg:pb-8">
+    <div className="min-h-screen pb-20 lg:pb-8 animated-gradient text-white">
       {/* Header with User Actions */}
-      <header className="absolute top-0 left-0 right-0 p-4 z-10">
+      <header className="absolute top-0 left-0 right-0 p-4 z-20">
         <div className="max-w-7xl mx-auto flex justify-end items-center">
           {user ? (
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" onClick={() => navigate('/user-panel')}>
+              <Button variant="ghost" size="icon" onClick={() => navigate('/user-panel')} className="text-white hover:bg-white/10">
                 <User className="h-5 w-5" />
               </Button>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
                 <LogOut className="h-5 w-5" />
               </Button>
             </div>
           ) : (
-            <Button variant="ghost" onClick={() => navigate('/sign-in')}>
+            <Button variant="ghost" onClick={() => navigate('/sign-in')} className="text-white hover:bg-white/10">
               <LogIn className="h-5 w-5 mr-2" />
               Sign In
             </Button>
@@ -48,35 +49,63 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-transparent" />
-        <div className="relative px-4 pt-24 pb-12 lg:pt-32 lg:pb-20 max-w-7xl mx-auto">
-          <div className="text-center lg:text-left lg:max-w-2xl">
-            <h1 className="text-4xl lg:text-6xl font-bold mb-4 animate-fade-in-up">
-              Snap to Find,{' '}
-              <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-                Snap to Buy
-              </span>
+      <div className="relative grid grid-cols-1 lg:grid-cols-4 min-h-screen">
+        {/* Left Panel: Categories */}
+        <aside className="hidden lg:block col-span-1 p-8 bg-black/20 backdrop-blur-lg">
+          <div className="sticky top-8">
+            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2"><TrendingUp /> Categories</h2>
+            <div className="space-y-4">
+              {categories.map((category) => (
+                <button
+                  key={category.name}
+                  onClick={() => navigate('/results')}
+                  className="w-full text-left p-4 rounded-lg transition-colors hover:bg-white/10 flex items-center gap-4"
+                >
+                  <span className="text-3xl">{category.icon}</span>
+                  <span className="font-semibold">{category.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="col-span-1 lg:col-span-3 relative z-10 flex flex-col justify-center items-center p-4 text-center">
+          <div className="absolute inset-0 overflow-hidden">
+            {floatingItems.map(item => (
+              <div
+                key={item.id}
+                className="absolute p-4 rounded-lg bg-white/10 backdrop-blur-md text-center shadow-lg"
+                style={item.style}
+              >
+                <div className="text-5xl mb-2">{item.image}</div>
+                <h3 className="font-semibold text-sm">{item.title}</h3>
+                <p className="text-primary font-bold">{item.price}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="relative z-10 flex flex-col items-center">
+            <h1 className="text-5xl lg:text-7xl font-bold mb-4 text-shadow-lg">
+              Snap to Find, Snap to Buy
             </h1>
-            <p className="text-lg text-muted-foreground mb-8 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-              Visual search for local classifieds. Take a photo, find it nearby.
+            <p className="text-xl text-white/80 mb-8 max-w-2xl text-shadow">
+              The ultimate visual marketplace. See something you like? Just snap a picture to find and buy it from sellers near you.
             </p>
 
-            {/* Search and Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <div className="w-full max-w-lg">
+              <div className="relative flex-1 mb-4">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50" />
                 <Input
-                  placeholder="Search for items..."
-                  className="pl-10 h-12 bg-card/50 backdrop-blur-xl border-white/10"
+                  placeholder="Or type to search..."
+                  className="pl-12 h-14 bg-white/10 backdrop-blur-xl border-white/20 rounded-full text-lg placeholder:text-white/50"
                   onKeyDown={(e) => e.key === 'Enter' && navigate('/results')}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Button
                   size="lg"
-                  className="bg-primary hover:bg-primary-glow shadow-lg shadow-primary/30"
+                  className="h-14 text-lg bg-primary hover:bg-primary-glow shadow-lg shadow-primary/30 rounded-full"
                   onClick={() => navigate('/camera', { state: { action: 'buy' } })}
                 >
                   <Camera className="h-5 w-5 mr-2" />
@@ -85,6 +114,7 @@ export default function Home() {
                 <Button
                   size="lg"
                   variant="secondary"
+                  className="h-14 text-lg bg-white/10 hover:bg-white/20 rounded-full text-white"
                   onClick={() => navigate('/camera', { state: { action: 'sell' } })}
                 >
                   <Camera className="h-5 w-5 mr-2" />
@@ -93,59 +123,20 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Categories */}
-      <div className="px-4 mb-12 max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">Browse Categories</h2>
-          <TrendingUp className="h-5 w-5 text-primary" />
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-          {categories.map((category) => (
-            <button
-              key={category.name}
-              onClick={() => navigate('/results')}
-              className="glass-card-hover p-6 text-center group"
-            >
-              <div className={`text-5xl mb-3 transform group-hover:scale-110 transition-transform duration-300`}>
-                {category.icon}
-              </div>
-              <h3 className="font-semibold text-sm">{category.name}</h3>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Recent Listings */}
-      <div className="px-4 max-w-7xl mx-auto">
-        <h2 className="text-2xl font-bold mb-6">Recent Listings Near You</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {recentListings.map((listing) => (
-            <button
-              key={listing.id}
-              onClick={() => navigate('/results')}
-              className="glass-card-hover p-4 text-left group"
-            >
-              <div className="flex items-start gap-4">
-                <div className="text-5xl flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                  {listing.image}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold mb-1 truncate">{listing.title}</h3>
-                  <p className="text-primary font-bold text-lg mb-1">{listing.price}</p>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span>{listing.location}</span>
-                    <span>•</span>
-                    <span>{listing.category}</span>
-                  </div>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
+        </main>
       </div>
     </div>
   );
+}
+
+@keyframes float {
+	0% {
+		transform: translatey(0px);
+	}
+	50% {
+		transform: translatey(-20px);
+	}
+	100% {
+		transform: translatey(0px);
+	}
 }
