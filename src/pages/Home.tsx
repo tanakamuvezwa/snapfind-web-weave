@@ -71,55 +71,57 @@ export default function Home() {
 
         {/* Main Content */}
         <main className="col-span-1 lg:col-span-3 relative z-10 flex flex-col justify-center items-center p-4 text-center">
-          <div className="absolute inset-0 overflow-hidden">
-            {floatingItems.map(item => (
-              <div
-                key={item.id}
-                className="absolute p-4 rounded-lg bg-white/10 backdrop-blur-md text-center shadow-lg"
-                style={item.style}
-              >
-                <div className="text-5xl mb-2">{item.image}</div>
-                <h3 className="font-semibold text-sm">{item.title}</h3>
-                <p className="text-primary font-bold">{item.price}</p>
-              </div>
-            ))}
-          </div>
+           <div className="absolute inset-0 overflow-hidden">
+             {floatingItems.map(item => (
+               <div
+                 key={item.id}
+                 className="absolute p-4 rounded-lg bg-white/10 backdrop-blur-md text-center shadow-lg"
+                 style={item.style}
+               >
+                 <div className="text-5xl mb-2">{item.image}</div>
+                 <h3 className="font-semibold text-sm">{item.title}</h3>
+                 <p className="text-primary font-bold">{item.price}</p>
+               </div>
+             ))}
+           </div>
 
           <div className="relative z-10 flex flex-col items-center">
             <h1 className="text-5xl lg:text-7xl font-bold mb-4 text-shadow-lg">
-              Snap to Find, Snap to Buy
+              Snap, List, Sell, Fast
             </h1>
-            <p className="text-xl text-white/80 mb-8 max-w-2xl text-shadow">
+            <p className="text-xl text-white/80 mb-12 max-w-2xl text-shadow">
               The ultimate visual marketplace. See something you like? Just snap a picture to find and buy it from sellers near you.
             </p>
 
-            <div className="w-full max-w-lg">
-              <div className="relative flex-1 mb-4">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50" />
+            <div className="w-full max-w-lg flex flex-col items-center gap-6">
+              {/* Search Bar */}
+              <div className="relative w-full">
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50" />
                 <Input
-                  placeholder="Or type to search..."
-                  className="pl-12 h-14 bg-white/10 backdrop-blur-xl border-white/20 rounded-full text-lg placeholder:text-white/50"
+                  placeholder="Search for anything..."
+                  className="pl-14 h-16 bg-white/10 backdrop-blur-xl border-white/20 rounded-full text-lg placeholder:text-white/50 w-full"
                   onKeyDown={(e) => e.key === 'Enter' && navigate('/results')}
                 />
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Button
-                  size="lg"
-                  className="h-14 text-lg bg-primary hover:bg-primary-glow shadow-lg shadow-primary/30 rounded-full"
-                  onClick={() => navigate('/camera', { state: { action: 'buy' } })}
-                >
-                  <Camera className="h-5 w-5 mr-2" />
-                  Snap to Buy
-                </Button>
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  className="h-14 text-lg bg-white/10 hover:bg-white/20 rounded-full text-white"
+
+              {/* Futuristic Camera Button Area */}
+              <div className="flex items-center justify-center gap-4 w-full">
+                <Button variant="link" className="text-white/80 hover:text-primary transition-colors text-lg font-semibold" onClick={() => navigate('/camera', { state: { action: 'buy' } })}
+                  >BUY</Button>
+                
+                <div 
+                  className="relative group cursor-pointer" 
                   onClick={() => navigate('/camera', { state: { action: 'sell' } })}
                 >
-                  <Camera className="h-5 w-5 mr-2" />
-                  Snap to Sell
-                </Button>
+                  <div className="absolute -inset-1.5 bg-cyan-400 rounded-full opacity-50 blur-xl group-hover:opacity-75 transition duration-500 animate-pulse-glow"></div>
+                  <button className="relative w-40 h-40 rounded-full bg-gray-800/80 backdrop-blur-sm border-2 border-cyan-400/50 flex flex-col items-center justify-center text-cyan-300 shadow-2xl shadow-cyan-500/20 transition-all duration-300 group-hover:shadow-cyan-500/50 group-hover:scale-105">
+                    <Camera className="h-12 w-12 text-cyan-300 mb-2 transition-transform duration-300 group-hover:scale-110" />
+                    <span className="font-bold tracking-widest uppercase">TAKE A SHOT</span>
+                  </button>
+                </div>
+
+                <Button variant="link" className="text-white/80 hover:text-primary transition-colors text-lg font-semibold" onClick={() => navigate('/camera', { state: { action: 'sell' } })}
+                  >OR SELL</Button>
               </div>
             </div>
           </div>

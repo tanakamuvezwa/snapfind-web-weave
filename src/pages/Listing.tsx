@@ -12,6 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { db } from '@/firebase'; // Import the Firebase db instance
+import { collection, addDoc, serverTimestamp } from "firebase/firestore"; 
 
 type AIAnalysis = {
   name: string;
@@ -33,6 +35,8 @@ export default function Listing() {
   const [price, setPrice] = useState(aiAnalysis?.suggestedPrice?.replace('$', '') || '');
   const [category, setCategory] = useState(aiAnalysis?.category.toLowerCase() || '');
   const [condition, setCondition] = useState(aiAnalysis?.condition.toLowerCase().replace(' ', '-') || '');
+  const [itemLocation, setItemLocation] = useState('New York'); // Added location state
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (aiAnalysis) {
@@ -41,9 +45,11 @@ export default function Listing() {
   }, [aiAnalysis]);
 
   const handleAddImage = () => {
-    // In a real app, this would open a file picker
     if (images.length < 6) {
-      setImages([...images, `https://images.unsplash.com/photo-${Date.now()}?w=400&h=400&fit=crop`]);
+      // This is a placeholder. In a real app, you'd use a file input
+      // and upload the file to a service like Firebase Storage.
+      const placeholderUrl = `https://images.unsplash.com/photo-${Date.now()}?w=400&h=400&fit=crop`;
+      setImages([...images, placeholderUrl]);
     }
   };
 
@@ -51,16 +57,59 @@ export default function Listing() {
     setImages(images.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success('Listing created successfully!');
-    // Here you would typically send the data to your backend
+    if (isSubmitting) return;
+
+    // Basic validation
+    if (!title || !price || !category || !condition || !itemLocation || images.length === 0) {
+      toast.error("Please fill all required fields and add at least one image.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    const promise = async () => {
+      try {
+        // Create a new listing object
+        const listingData = {
+          title,
+          description,
+          price: parseFloat(price),
+          category,
+          condition,
+          location: itemLocation,
+          images, // In a real app, these would be URLs from a storage service
+          createdAt: serverTimestamp(),
+          // In a real app, you would add a userId here
+          // userId: auth.currentUser.uid,
+        };
+
+        // Add the document to the 'listings' collection in Firestore
+        const docRef = await addDoc(collection(db, "listings"), listingData);
+        console.log("Document written with ID: ", docRef.id);
+        
+        // Redirect after a short delay to allow toast to be seen
+        setTimeout(() => navigate('/'), 1500);
+
+      } catch (error) {
+        console.error("Error adding document: ", error);
+        // Re-throw the error to be caught by the toast promise handler
+        throw new Error("Failed to create listing. Please try again.");
+      }
+    };
+
+    toast.promise(promise(), {
+      loading: 'Publishing your listing...',
+      success: 'Listing created successfully!',
+      error: (err) => err.message,
+      finally: () => setIsSubmitting(false),
+    });
   };
 
   return (
     <div className="min-h-screen pb-20 lg:pb-8 px-4 pt-8 max-w-6xl mx-auto">
       <div className="mb-8 flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
@@ -133,7 +182,7 @@ export default function Listing() {
            <div className="glass-card p-6 space-y-4">
              <div>
                 <label className="block text-sm font-medium mb-2">Category</label>
-                <Select value={category} onValueChange={setCategory}>
+                <Select value={category} onValueChange={setCategory} required>
                   <SelectTrigger className="bg-card/50"><SelectValue placeholder="Select category" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="electronics">Electronics</SelectItem>
@@ -147,7 +196,7 @@ export default function Listing() {
 
               <div>
                 <label className="block text-sm font-medium mb-2">Condition</label>
-                <Select value={condition} onValueChange={setCondition}>
+                <Select value={condition} onValueChange={setCondition} required>
                   <SelectTrigger className="bg-card/50"><SelectValue placeholder="Select condition" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="new">New</SelectItem>
@@ -173,13 +222,13 @@ export default function Listing() {
 
              <div>
                 <label className="block text-sm font-medium mb-2">Location</label>
-                <Input placeholder="Enter your city" className="bg-card/50" required />
+                <Input placeholder="Enter your city" className="bg-card/50" value={itemLocation} onChange={(e) => setItemLocation(e.target.value)} required />
                 <p className="text-xs text-muted-foreground mt-2">Your exact address won't be shown publicly.</p>
               </div>
            </div>
           
-          <Button type="submit" size="lg" className="w-full bg-primary hover:bg-primary-glow shadow-lg shadow-primary/30">
-            Publish Listing
+          <Button type="submit" size="lg" className="w-full bg-primary hover:bg-primary-glow shadow-lg shadow-primary/30" disabled={isSubmitting}>
+            {isSubmitting ? 'Publishing...' : 'Publish Listing'}
           </Button>
         </div>
       </form>
