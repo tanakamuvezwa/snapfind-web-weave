@@ -1,10 +1,12 @@
-import { Search, Annoyed, Wind, Watch, ToyBrick, Car, Home as HomeIcon, Shirt, ShoppingCart, LogIn, User, LogOut } from 'lucide-react';
+import { Search, Annoyed, Wind, Watch, ToyBrick, Car, Home as HomeIcon, Shirt, ShoppingCart, LogIn, User, LogOut, PlusCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
+import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { useState, useEffect } from 'react';
 
 const categories = [
   { name: 'Electronics', icon: <Watch /> },
@@ -17,27 +19,13 @@ const categories = [
   { name: 'All Categories', icon: <ShoppingCart /> },
 ];
 
-const featuredItems = [
-  { id: 1, title: 'Vintage Leather Jacket', price: '$150', image: '🧥' },
-  { id: 2, title: 'Antique Pocket Watch', price: '$500', image: '⌚' },
-  { id: 3, title: 'Rare Comic Book', price: '$275', image: '📖' },
-  { id: 4, title: 'Custom Mechanical Keyboard', price: '$220', image: '⌨️' },
-];
-
-const newArrivals = [
-  { id: 1, title: 'Modern Art Print', price: '$80', image: '🖼️' },
-  { id: 2, title: 'Handmade Ceramic Mug', price: '$35', image: '☕' },
-  { id: 3, title: 'Smart Home Hub', price: '$120', image: '🤖' },
-  { id: 4, title: 'Designer Sunglasses', price: '$190', image: '😎' },
-];
-
 const ItemCard = ({ item }) => (
   <Card className="overflow-hidden transform hover:scale-105 transition-transform duration-300">
     <CardContent className="p-0">
-      <div className="aspect-square bg-gray-100 flex items-center justify-center text-5xl">{item.image}</div>
+      <img src={item.imageUrl} alt={item.title} className="aspect-square w-full object-cover" />
       <div className="p-4">
         <h3 className="font-semibold truncate">{item.title}</h3>
-        <p className="text-primary font-bold">{item.price}</p>
+        <p className="text-primary font-bold">{`$${item.price}`}</p>
       </div>
     </CardContent>
   </Card>
@@ -46,6 +34,36 @@ const ItemCard = ({ item }) => (
 export default function Home() {
   const navigate = useNavigate();
   const [user] = useAuthState(auth);
+  const [featuredItems, setFeaturedItems] = useState([]);
+  const [newArrivals, setNewArrivals] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchListings = async () => {
+      setLoading(true);
+      try {
+        const listingsRef = collection(db, 'listings');
+
+        const newArrivalsQuery = query(listingsRef, orderBy('createdAt', 'desc'), limit(4));
+        const newArrivalsSnapshot = await getDocs(newArrivalsQuery);
+        const newArrivalsData = newArrivalsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setNewArrivals(newArrivalsData);
+
+        const featuredQuery = query(listingsRef, orderBy('createdAt', 'asc'), limit(4));
+        const featuredSnapshot = await getDocs(featuredQuery);
+        const featuredData = featuredSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setFeaturedItems(featuredData);
+
+      } catch (error) {
+        console.error("Error fetching listings:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchListings();
+  }, []);
+
 
   const handleSignOut = async () => {
     await auth.signOut();
@@ -67,6 +85,10 @@ export default function Home() {
           <div className="flex items-center gap-2">
             {user ? (
               <>
+                <Button onClick={() => navigate('/create-listing')}>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  List Item
+                </Button>
                 <Button variant="ghost" size="icon">
                   <User />
                 </Button>
@@ -103,16 +125,24 @@ export default function Home() {
 
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-gray-800 mb-6">Featured Items</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {featuredItems.map(item => <ItemCard key={item.id} item={item} />)}
-          </div>
+          {loading ? (
+            <p>Loading items...</p>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {featuredItems.map(item => <ItemCard key={item.id} item={item} />)}
+            </div>
+          )}
         </section>
 
         <section>
           <h2 className="text-3xl font-bold text-gray-800 mb-6">New Arrivals</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {newArrivals.map(item => <ItemCard key={item.id} item={item} />)}
-          </div>
+          {loading ? (
+            <p>Loading items...</p>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {newArrivals.map(item => <ItemCard key={item.id} item={item} />)}
+            </div>
+          )}
         </section>
       </main>
     </div>
