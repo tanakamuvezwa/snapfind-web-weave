@@ -1,58 +1,52 @@
-import { Camera, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Aperture, Search, LayoutGrid, MessageSquare, User } from 'lucide-react';
+import '../styles/welcome.css'; // New CSS for the welcome page
+
+// Mock phone image component for demonstration
+const PhoneMockup = () => (
+  <div className="relative h-[600px] w-[300px] bg-black border-4 border-gray-700 rounded-4xl overflow-hidden shadow-2xl rotate-in">
+    <div className="absolute inset-0 bg-gray-900/50 flex flex-col justify-center items-center p-4">
+      <div className="w-48 h-48 rounded-full border-8 border-orange-500/30 flex justify-center items-center mb-8 fiery-orange-pulse">
+        <div className="w-36 h-36 rounded-full bg-orange-500/20 flex justify-center items-center">
+          <Aperture className="w-24 h-24 text-orange-400" />
+        </div>
+      </div>
+      <h1 className="text-4xl font-bold text-white">Snap&Find</h1>
+      <p className="text-orange-400 text-sm">AI-Powered Visual-First Classifieds</p>
+    </div>
+  </div>
+);
+
+const MenuLink = ({ icon, label, to }) => {
+  const navigate = useNavigate();
+  return (
+    <button onClick={() => navigate(to)} className="flex items-center gap-4 text-xl text-gray-300 hover:text-white hover:bg-white/5 p-3 rounded-lg transition-all duration-300 w-full text-left">
+      {icon}
+      <span>{label}</span>
+    </button>
+  );
+}
 
 export default function Welcome() {
   const navigate = useNavigate();
 
-  const handleAction = (action: 'buy' | 'sell') => {
-    navigate('/camera', { state: { action } });
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-background via-background to-primary/5">
-      <div className="text-center max-w-md mx-auto animate-fade-in">
-        {/* Logo */}
-        <div className="mb-8 relative">
-          <div className="inline-flex items-center justify-center w-32 h-32 rounded-full bg-gradient-to-br from-primary to-primary-glow shadow-lg shadow-primary/50 mb-4">
-            <Camera className="h-16 w-16 text-white" strokeWidth={2.5} />
-          </div>
-          <Sparkles className="absolute top-0 right-1/3 h-8 w-8 text-primary animate-pulse" />
+    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-8 overflow-hidden">
+      <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-16 max-w-7xl mx-auto">
+        {/* Left Side: Phone Mockup */}
+        <div className="flex justify-center">
+          <PhoneMockup />
         </div>
 
-        {/* Branding */}
-        <h1 className="text-5xl lg:text-6xl font-bold mb-3 bg-gradient-to-r from-white via-primary-glow to-primary bg-clip-text text-transparent">
-          SnapFind
-        </h1>
-        <p className="text-xl text-muted-foreground mb-12">
-          AI-Powered Visual Marketplace
-        </p>
-
-        {/* Action Buttons */}
-        <div className="space-y-4">
-          <Button
-            size="lg"
-            className="w-full h-16 text-lg bg-primary hover:bg-primary-glow shadow-lg shadow-primary/30 group"
-            onClick={() => handleAction('buy')}
-          >
-            <Camera className="mr-3 h-6 w-6 group-hover:scale-110 transition-transform" />
-            Snap to Buy
-          </Button>
-
-          <Button
-            size="lg"
-            variant="outline"
-            className="w-full h-16 text-lg border-primary/30 hover:bg-primary/10 hover:border-primary group"
-            onClick={() => handleAction('sell')}
-          >
-            <Camera className="mr-3 h-6 w-6 group-hover:scale-110 transition-transform" />
-            Snap to Sell
-          </Button>
+        {/* Right Side: Menu */}
+        <div className="flex flex-col gap-6">
+          <h2 className="text-5xl font-bold mb-6">Welcome to Snap&Find</h2>
+          <MenuLink icon={<Search className="text-orange-400" />} label="AI Search" to="/camera" />
+          <MenuLink icon={<LayoutGrid className="text-orange-400" />} label="Categories" to="/categories" />
+          <MenuLink icon={<Aperture className="text-orange-400" />} label="Listings" to="/results" />
+          <MenuLink icon={<MessageSquare className="text-orange-400" />} label="Chat" to="/chat" />
+          <MenuLink icon={<User className="text-orange-400" />} label="Profile" to="/user-panel" />
         </div>
-
-        <p className="mt-8 text-sm text-muted-foreground">
-          Take a photo and let AI do the rest
-        </p>
       </div>
     </div>
   );

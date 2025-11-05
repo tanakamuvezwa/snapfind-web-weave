@@ -12,6 +12,8 @@ import Results from "./pages/Results";
 import Listing from "./pages/Listing";
 import Chat from "./pages/Chat";
 import Wanted from "./pages/Wanted";
+import Categories from "./pages/Categories";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +34,8 @@ function AppContent() {
           <Route path="/listing" element={<Listing />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/wanted" element={<Wanted />} />
+          <Route path="/categories" element={<Categories />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
