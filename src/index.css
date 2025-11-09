@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -97,6 +98,17 @@ All colors MUST be HSL.
 
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-muted-foreground/50;
+  }
+}
+
+/* Custom animation and hue styles */
+@layer utilities {
+  .rotate-360 {
+    transform: rotate(360deg);
+  }
+  
+  .orange-hue {
+    background-image: radial-gradient(ellipse at center, hsla(16, 100%, 60%, 0.1) 0%, transparent 60%);
   }
 }
 

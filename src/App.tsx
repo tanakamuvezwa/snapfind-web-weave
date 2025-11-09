@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,7 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { useBreakpoint } from "@/hooks/useBreakpoint";
 import Welcome from "./pages/Welcome";
-import Home from "./pages/Home";
+import MarketplacePage from "./pages/Marketplace"; // Import the new Marketplace page
 import Camera from "./pages/Camera";
 import Results from "./pages/Results";
 import Listing from "./pages/Listing";
@@ -29,7 +30,8 @@ function AppContent() {
       <main className={`flex-1 ${isDesktop ? 'ml-64' : ''}`}>
         <Routes>
           <Route path="/" element={<Welcome />} />
-          <Route path="/home" element={<Home />} />
+          {/* The /home route now shows the new Marketplace page */}
+          <Route path="/home" element={<MarketplacePage />} />
           <Route path="/camera" element={<Camera />} />
           <Route path="/results" element={<Results />} />
           <Route path="/listing" element={<Listing />} />
