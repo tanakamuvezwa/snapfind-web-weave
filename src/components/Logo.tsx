@@ -1,9 +1,9 @@
 
 import React from 'react';
 
-const Logo = () => {
+const Logo = ({ className = '' }: { className?: string }) => {
   return (
-    <h1 className="text-2xl font-bold">SnapFind</h1>
+    <img src="/logo.png" alt="Snap&Find" className={className} />
   );
 };
 

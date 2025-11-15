@@ -2,7 +2,7 @@
 import os
 import json
 from flask import Flask, request, jsonify
-import tensorflow as tf
+from google.cloud import vision
 import numpy as np
 from PIL import Image
 import cv2
@@ -27,18 +27,13 @@ def load_products():
 
 products_db = load_products()
 
-# --- Load TensorFlow Model ---
-def load_model():
-    try:
-        model = tf.saved_model.load("https://tfhub.dev/tensorflow/ssd_mobilenet_v2/2")
-        print("TensorFlow model loaded successfully.")
-        return model
-    except Exception as e:
-        print(f"ERROR: Could not load TensorFlow model: {e}")
-        print("Object detection will be disabled.")
-        return None
-
-model = load_model()
+# --- Instantiate Vision Client ---
+try:
+    vision_client = vision.ImageAnnotatorClient()
+    print("Google Cloud Vision client instantiated successfully.")
+except Exception as e:
+    print(f"ERROR: Could not instantiate Google Cloud Vision client: {e}")
+    vision_client = None
 
 # --- Flask App ---
 app = Flask(__name__)
@@ -47,10 +42,10 @@ app = Flask(__name__)
 def identify_objects():
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
-    
+
     file = request.files['file']
     filename = file.filename
-    
+
     if filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
@@ -68,32 +63,31 @@ def identify_objects():
             })
 
     # --- 2. Fallback to Object Detection ---
-    if model is None:
-        # If the model failed to load, we can't proceed with object detection
-        return jsonify({'error': 'Object detection model is not available.'}), 500
-        
+    if vision_client is None:
+        return jsonify({'error': 'Google Cloud Vision client is not available.'}), 500
+
     print("No match by filename, proceeding with object detection.")
     try:
         # Read the image file for detection
-        image = Image.open(file.stream)
-        image_np = np.array(image)
-        
-        # Add a batch dimension
-        input_tensor = tf.convert_to_tensor(image_np)
-        input_tensor = input_tensor[tf.newaxis, ...]
+        content = file.read()
+        image = vision.Image(content=content)
 
-        # Run inference
-        detections = model(input_tensor)
+
+        # Run label detection
+        response = vision_client.label_detection(image=image)
+        labels = response.label_annotations
 
         # Process the results
-        num_detections = int(detections.pop('num_detections'))
         detected_objects = []
+        for label in labels:
+            detected_objects.append(label.description)
+
 
         # For now, let's just return a generic object detection response
         # (You can refine this part later to match detected objects to your products_db)
         return jsonify({
             'source': 'object_detection',
-            'objects_detected': int(num_detections)
+            'objects_detected': detected_objects
         })
 
     except Exception as e:

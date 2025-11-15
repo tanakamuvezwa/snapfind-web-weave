@@ -1,19 +1,40 @@
 import { useNavigate } from 'react-router-dom';
-import { Annoyed, Wind, Watch, ToyBrick, Car, Home as HomeIcon, Shirt, ShoppingCart } from 'lucide-react';
+import {
+    Wrench,
+    Flower,
+    Lamp,
+    Baby,
+    ToyBrick,
+    CarSeat,
+    Shirt,
+    Bike,
+    Dumbbell,
+    Tent,
+    BookOpen,
+    Music,
+    Paintbrush,
+    Sparkles,
+    Dog,
+    Gem,
+    Ticket
+} from 'lucide-react';
 
 const allCategories = [
-    { name: 'Electronics', icon: <Watch size={32} /> },
-    { name: 'Vehicles', icon: <Car size={32} /> },
-    { name: 'Property', icon: <HomeIcon size={32} /> },
-    { name: 'Apparel', icon: <Shirt size={32} /> },
+    { name: 'Tools & Equipment', icon: <Wrench size={32} /> },
+    { name: 'Patio & Garden', icon: <Flower size={32} /> },
+    { name: 'Indoor Decor', icon: <Lamp size={32} /> },
     { name: 'Toys & Games', icon: <ToyBrick size={32} /> },
-    { name: 'Collectibles', icon: <Annoyed size={32} /> },
-    { name: 'Appliances', icon: <Wind size={32} /> },
-    { name: 'Books & Magazines', icon: <ToyBrick size={32} /> },
-    { name: 'Sporting Goods', icon: <ToyBrick size={32} /> },
-    { name: 'Music & Instruments', icon: <ToyBrick size={32} /> },
-    { name: 'Art & Crafts', icon: <ToyBrick size={32} /> },
-    { name: 'Home & Garden', icon: <HomeIcon size={32} /> },
+    { name: 'Baby Gear', icon: <CarSeat size={32} /> },
+    { name: "Kids' Clothing", icon: <Shirt size={32} /> },
+    { name: 'Bikes & Cycling', icon: <Bike size={32} /> },
+    { name: 'Fitness & Exercise', icon: <Dumbbell size={32} /> },
+    { name: 'Camping & Hiking', icon: <Tent size={32} /> },
+    { name: 'Books, Movies & Music', icon: <BookOpen size={32} /> },
+    { name: 'Musical Instruments', icon: <Music size={32} /> },
+    { name: 'Arts & Crafts', icon: <Paintbrush size={32} /> },
+    { name: 'Pet Supplies', icon: <Dog size={32} /> },
+    { name: 'Antiques & Collectibles', icon: <Gem size={32} /> },
+    { name: 'Tickets', icon: <Ticket size={32} /> },
 ];
 
 export default function Categories() {

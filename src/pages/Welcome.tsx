@@ -1,63 +1,53 @@
-
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles, ShoppingCart, Tag } from "lucide-react";
-import Logo from "@/components/Logo";
+import { Aperture, Search, LayoutGrid, MessageSquare, User } from 'lucide-react';
+import '../styles/welcome.css'; // New CSS for the welcome page
 
-const Welcome = () => {
+// Mock phone image component for demonstration
+const PhoneMockup = () => (
+  <div className="relative h-[600px] w-[300px] bg-black border-4 border-gray-700 rounded-4xl overflow-hidden shadow-2xl rotate-in">
+    <div className="absolute inset-0 bg-gray-900/50 flex flex-col justify-center items-center p-4">
+      <div className="w-48 h-48 rounded-full border-8 border-orange-500/30 flex justify-center items-center mb-8 fiery-orange-pulse">
+        <div className="w-36 h-36 rounded-full bg-orange-500/20 flex justify-center items-center">
+          <Aperture className="w-24 h-24 text-orange-400" />
+        </div>
+      </div>
+      <h1 className="text-4xl font-bold text-white">Snap&Find</h1>
+      <p className="text-orange-400 text-sm">AI-Powered Visual-First Classifieds</p>
+    </div>
+  </div>
+);
+
+const MenuLink = ({ icon, label, to }) => {
   const navigate = useNavigate();
-  const [isSpinning, setIsSpinning] = useState(false);
+  return (
+    <button onClick={() => navigate(to)} className="flex items-center gap-4 text-xl text-gray-300 hover:text-white hover:bg-white/5 p-3 rounded-lg transition-all duration-300 w-full text-left">
+      {icon}
+      <span>{label}</span>
+    </button>
+  );
+}
 
-  const handleLogoClick = () => {
-    setIsSpinning(true);
-    // Wait for the spin animation to be visually noticeable before navigating
-    setTimeout(() => {
-      navigate('/home');
-    }, 300); // 300ms delay
-  };
+export default function Welcome() {
+  const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 md:p-8">
+    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-8 overflow-hidden">
+      <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-16 max-w-7xl mx-auto">
+        {/* Left Side: Phone Mockup */}
+        <div className="flex justify-center">
+          <PhoneMockup />
+        </div>
 
-      {/* Main Card */}
-      <Card className="w-full max-w-4xl bg-background border-none shadow-none">
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-          
-          {/* Left Side: Interactive Logo */}
-          <div 
-            className="flex flex-col items-center justify-center p-8 bg-card rounded-xl cursor-pointer transform hover:scale-105 transition-transform duration-300"
-            onClick={handleLogoClick}
-          >
-            <div className={`transition-transform duration-500 ${isSpinning ? 'rotate-360' : ''}`}>
-              <Logo className="w-48 h-48" />
-            </div>
-            <h2 className="mt-4 text-3xl font-bold text-center">Snap&Find</h2>
-            <p className="text-muted-foreground text-center">AI-Powered Visual-First Classifieds</p>
-          </div>
-
-          {/* Right Side: Options */}
-          <div className="flex flex-col space-y-6">
-            <h1 className="text-4xl md:text-5xl font-bold text-center md:text-left">Welcome to Snap&Find</h1>
-            
-            <Button size="lg" className="w-full justify-start text-lg py-6" onClick={() => navigate('/camera?action=buy')}>
-              <Sparkles className="mr-4 h-6 w-6" /> AI Search
-            </Button>
-
-            <Button size="lg" className="w-full justify-start text-lg py-6" onClick={() => navigate('/home')}>
-                <ShoppingCart className="mr-4 h-6 w-6" /> Browse Marketplace
-            </Button>
-            
-            <Button size="lg" className="w-full justify-start text-lg py-6" onClick={() => navigate('/camera?action=sell')}>
-              <Tag className="mr-4 h-6 w-6" /> List an Item
-            </Button>
-
-          </div>
-        </CardContent>
-      </Card>
+        {/* Right Side: Menu */}
+        <div className="flex flex-col gap-6">
+          <h2 className="text-5xl font-bold mb-6">Welcome to Snap&Find</h2>
+          <MenuLink icon={<Search className="text-orange-400" />} label="AI Search" to="/camera" />
+          <MenuLink icon={<LayoutGrid className="text-orange-400" />} label="Categories" to="/categories" />
+          <MenuLink icon={<Aperture className="text-orange-400" />} label="Listings" to="/results" />
+          <MenuLink icon={<MessageSquare className="text-orange-400" />} label="Chat" to="/chat" />
+          <MenuLink icon={<User className="text-orange-400" />} label="Profile" to="/user-panel" />
+        </div>
+      </div>
     </div>
   );
-};
-
-export default Welcome;
+}

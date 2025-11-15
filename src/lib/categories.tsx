@@ -1,0 +1,37 @@
+import {
+    Wrench,
+    Flower,
+    Lamp,
+    Baby,
+    ToyBrick,
+    CarSeat,
+    Shirt,
+    Bike,
+    Dumbbell,
+    Tent,
+    BookOpen,
+    Music,
+    Paintbrush,
+    Sparkles,
+    Dog,
+    Gem,
+    Ticket
+} from 'lucide-react';
+
+export const allCategories = [
+    { name: 'Tools & Equipment', icon: <Wrench size={32} /> },
+    { name: 'Patio & Garden', icon: <Flower size={32} /> },
+    { name: 'Indoor Decor', icon: <Lamp size={32} /> },
+    { name: 'Toys & Games', icon: <ToyBrick size={32} /> },
+    { name: 'Baby Gear', icon: <CarSeat size={32} /> },
+    { name: "Kids' Clothing", icon: <Shirt size={32} /> },
+    { name: 'Bikes & Cycling', icon: <Bike size={32} /> },
+    { name: 'Fitness & Exercise', icon: <Dumbbell size={32} /> },
+    { name: 'Camping & Hiking', icon: <Tent size={32} /> },
+    { name: 'Books, Movies & Music', icon: <BookOpen size={32} /> },
+    { name: 'Musical Instruments', icon: <Music size={32} /> },
+    { name: 'Arts & Crafts', icon: <Paintbrush size={32} /> },
+    { name: 'Pet Supplies', icon: <Dog size={32} /> },
+    { name: 'Antiques & Collectibles', icon: <Gem size={32} /> },
+    { name: 'Tickets', icon: <Ticket size={32} /> },
+];
