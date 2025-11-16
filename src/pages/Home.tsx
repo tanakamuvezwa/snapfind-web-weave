@@ -1,30 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../firebase';
-import { Aperture, Search, LayoutGrid, Tag, MessageSquare, User } from 'lucide-react';
+import { Aperture, Search, LayoutGrid, Tag, MessageSquare, Flame } from 'lucide-react';
 import '../styles/home.css';
 
 const Home: React.FC = () => {
-  const [user] = useAuthState(auth);
   const [isRotating, setIsRotating] = useState(false);
   const navigate = useNavigate();
 
   const handleLogoClick = () => {
     setIsRotating(true);
     setTimeout(() => {
-      navigate('/capture');
-    }, 700); // This duration should match the animation duration in home.css
+      navigate('/camera');
+    }, 700);
   };
-
-  if (!user) {
-    // Optionally, you can redirect to a login page or show a message
-    return (
-      <div className="home-container">
-        <p>Please log in to continue.</p>
-      </div>
-    );
-  }
 
   return (
     <div className="home-container">
@@ -49,26 +37,26 @@ const Home: React.FC = () => {
         <div className="navigation-section">
           <h2 className="welcome-title">Welcome to Snap&Find</h2>
           <nav className="nav-links">
-            <a href="/search" className="nav-link">
+            <button onClick={() => navigate('/camera')} className="nav-link">
               <Search className="nav-icon" />
               <span>AI Search</span>
-            </a>
-            <a href="/categories" className="nav-link">
+            </button>
+            <button onClick={() => navigate('/categories')} className="nav-link">
               <LayoutGrid className="nav-icon" />
               <span>Categories</span>
-            </a>
-            <a href="/listings" className="nav-link">
+            </button>
+            <button onClick={() => navigate('/results')} className="nav-link">
               <Tag className="nav-icon" />
               <span>Listings</span>
-            </a>
-            <a href="/chat" className="nav-link">
+            </button>
+            <button onClick={() => navigate('/chat')} className="nav-link">
               <MessageSquare className="nav-icon" />
               <span>Chat</span>
-            </a>
-            <a href="/profile" className="nav-link">
-              <User className="nav-icon" />
-              <span>Profile</span>
-            </a>
+            </button>
+            <button onClick={() => navigate('/wanted')} className="nav-link">
+              <Flame className="nav-icon" />
+              <span>Wanted</span>
+            </button>
           </nav>
         </div>
       </div>
