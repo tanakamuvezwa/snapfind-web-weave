@@ -26,6 +26,7 @@ type Conversation = {
   lastMessage: string;
   lastMessageTimestamp: Timestamp;
   unreadCount: { [uid: string]: number };
+  type: 'company' | 'individual';
 };
 
 type Message = {
@@ -120,42 +121,118 @@ export default function Chat() {
     return convo.participantDetails[otherUid || ''] || { name: 'Unknown', avatar: '👤' };
   }
 
-  const ChatList = () => (
-    <div className="space-y-3">
-      <div className="glass-card p-4 space-y-3">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search conversations..." className="pl-9 bg-card/50" />
+  const ChatList = () => {
+    const filteredConvos = conversations.filter(conv => {
+      if (filter === 'sellers') return conv.type === 'company';
+      if (filter === 'buyers') return conv.type === 'individual';
+      return true;
+    });
+
+    const companyConvos = conversations.filter(c => c.type === 'company');
+    const individualConvos = conversations.filter(c => c.type === 'individual');
+
+    return (
+      <div className="space-y-3">
+        <div className="glass-card p-4 space-y-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Search conversations..." className="pl-9 bg-card/50" />
+          </div>
+          <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)} className="w-full">
+            <TabsList className="grid w-full grid-cols-3 bg-card/50">
+              <TabsTrigger value="all" className="text-xs">All ({conversations.length})</TabsTrigger>
+              <TabsTrigger value="sellers" className="text-xs"><Store className="h-3 w-3 mr-1" />Companies ({companyConvos.length})</TabsTrigger>
+              <TabsTrigger value="buyers" className="text-xs"><User className="h-3 w-3 mr-1" />Individuals ({individualConvos.length})</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
-        <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-card/50">
-            <TabsTrigger value="all" className="text-xs">All</TabsTrigger>
-            <TabsTrigger value="sellers" className="text-xs"><Store className="h-3 w-3 mr-1" />Sellers</TabsTrigger>
-            <TabsTrigger value="buyers" className="text-xs"><User className="h-3 w-3 mr-1" />Buyers</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-      <div className="space-y-2">
-        {loading ? <p>Loading chats...</p> : conversations.map((conv) => {
-          const otherParticipant = getOtherParticipant(conv);
-          return (
-            <button key={conv.id} onClick={() => setSelectedConversation(conv)} className={`w-full glass-card-hover p-4 flex items-center gap-3 border-l-2 ${
-                selectedConversation?.id === conv.id ? 'bg-primary/20 border-primary' : 'border-transparent'
-              }`}>
-              <div className="text-3xl flex-shrink-0 relative">{otherParticipant.avatar}</div>
-              <div className="flex-1 text-left min-w-0">
-                <div className="flex items-center justify-between mb-1">
-                  <h3 className="font-semibold truncate">{otherParticipant.name}</h3>
-                  <span className="text-xs text-muted-foreground ml-2">{conv.lastMessageTimestamp?.toDate().toLocaleTimeString()}</span>
-                </div>
-                <p className="text-sm text-muted-foreground truncate">{conv.lastMessage}</p>
+
+        {filter === 'all' ? (
+          <>
+            {companyConvos.length > 0 && (
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-muted-foreground px-2 flex items-center gap-2">
+                  <Store className="h-4 w-4" />
+                  Companies
+                </h3>
+                {companyConvos.map((conv) => {
+                  const otherParticipant = getOtherParticipant(conv);
+                  return (
+                    <button key={conv.id} onClick={() => setSelectedConversation(conv)} className={`w-full glass-card-hover p-4 flex items-center gap-3 border-l-2 ${
+                        selectedConversation?.id === conv.id ? 'bg-primary/20 border-primary' : 'border-transparent'
+                      }`}>
+                      <div className="text-3xl flex-shrink-0 relative">
+                        {otherParticipant.avatar}
+                        <Store className="h-4 w-4 absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full p-0.5" />
+                      </div>
+                      <div className="flex-1 text-left min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <h3 className="font-semibold truncate">{otherParticipant.name}</h3>
+                          <span className="text-xs text-muted-foreground ml-2">{conv.lastMessageTimestamp?.toDate().toLocaleTimeString()}</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground truncate">{conv.lastMessage}</p>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
-            </button>
-          )
-        })}
+            )}
+
+            {individualConvos.length > 0 && (
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-muted-foreground px-2 flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Individuals
+                </h3>
+                {individualConvos.map((conv) => {
+                  const otherParticipant = getOtherParticipant(conv);
+                  return (
+                    <button key={conv.id} onClick={() => setSelectedConversation(conv)} className={`w-full glass-card-hover p-4 flex items-center gap-3 border-l-2 ${
+                        selectedConversation?.id === conv.id ? 'bg-primary/20 border-primary' : 'border-transparent'
+                      }`}>
+                      <div className="text-3xl flex-shrink-0 relative">{otherParticipant.avatar}</div>
+                      <div className="flex-1 text-left min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <h3 className="font-semibold truncate">{otherParticipant.name}</h3>
+                          <span className="text-xs text-muted-foreground ml-2">{conv.lastMessageTimestamp?.toDate().toLocaleTimeString()}</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground truncate">{conv.lastMessage}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="space-y-2">
+            {loading ? <p className="text-center py-4">Loading chats...</p> : filteredConvos.length === 0 ? (
+              <p className="text-center py-8 text-muted-foreground">No conversations found</p>
+            ) : filteredConvos.map((conv) => {
+              const otherParticipant = getOtherParticipant(conv);
+              return (
+                <button key={conv.id} onClick={() => setSelectedConversation(conv)} className={`w-full glass-card-hover p-4 flex items-center gap-3 border-l-2 ${
+                    selectedConversation?.id === conv.id ? 'bg-primary/20 border-primary' : 'border-transparent'
+                  }`}>
+                  <div className="text-3xl flex-shrink-0 relative">
+                    {otherParticipant.avatar}
+                    {conv.type === 'company' && <Store className="h-4 w-4 absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full p-0.5" />}
+                  </div>
+                  <div className="flex-1 text-left min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-semibold truncate">{otherParticipant.name}</h3>
+                      <span className="text-xs text-muted-foreground ml-2">{conv.lastMessageTimestamp?.toDate().toLocaleTimeString()}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground truncate">{conv.lastMessage}</p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   const ChatWindow = () => {
     if (!user) return <div>Please log in to see your messages.</div>
