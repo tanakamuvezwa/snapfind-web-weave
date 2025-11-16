@@ -5,7 +5,6 @@ import {
     Lamp,
     Baby,
     ToyBrick,
-    CarSeat,
     Shirt,
     Bike,
     Dumbbell,
@@ -13,7 +12,6 @@ import {
     BookOpen,
     Music,
     Paintbrush,
-    Sparkles,
     Dog,
     Gem,
     Ticket
@@ -24,7 +22,7 @@ const allCategories = [
     { name: 'Patio & Garden', icon: <Flower size={32} /> },
     { name: 'Indoor Decor', icon: <Lamp size={32} /> },
     { name: 'Toys & Games', icon: <ToyBrick size={32} /> },
-    { name: 'Baby Gear', icon: <CarSeat size={32} /> },
+    { name: 'Baby Gear', icon: <Baby size={32} /> },
     { name: "Kids' Clothing", icon: <Shirt size={32} /> },
     { name: 'Bikes & Cycling', icon: <Bike size={32} /> },
     { name: 'Fitness & Exercise', icon: <Dumbbell size={32} /> },
@@ -41,27 +39,21 @@ export default function Categories() {
     const navigate = useNavigate();
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <header className="bg-white border-b sticky top-0 z-10">
-                <div className="max-w-7xl mx-auto p-4">
-                    <h1 className="text-3xl font-bold text-gray-800">All Categories</h1>
-                </div>
-            </header>
+        <div className="min-h-screen pb-20 lg:pb-8 px-4 pt-8 max-w-7xl mx-auto">
+            <h1 className="text-3xl font-bold mb-6">All Categories</h1>
 
-            <main className="max-w-7xl mx-auto p-4 lg:p-8">
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                    {allCategories.map((category) => (
-                        <button
-                            key={category.name}
-                            onClick={() => navigate('/results')}
-                            className="flex flex-col items-center justify-center p-6 bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow border border-transparent hover:border-orange-400 aspect-square"
-                        >
-                            <div className="text-orange-500 mb-4">{category.icon}</div>
-                            <span className="text-md font-semibold text-center text-gray-700">{category.name}</span>
-                        </button>
-                    ))}
-                </div>
-            </main>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                {allCategories.map((category) => (
+                    <button
+                        key={category.name}
+                        onClick={() => navigate('/results', { state: { category: category.name } })}
+                        className="glass-card-hover flex flex-col items-center justify-center p-6 aspect-square group"
+                    >
+                        <div className="text-primary mb-4 group-hover:scale-110 transition-transform">{category.icon}</div>
+                        <span className="text-sm font-semibold text-center">{category.name}</span>
+                    </button>
+                ))}
+            </div>
         </div>
     );
 }
