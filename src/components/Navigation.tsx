@@ -1,6 +1,7 @@
-import { Home, Camera, Search, PlusCircle, MessageCircle, Heart } from 'lucide-react';
+import { Home, Camera, Search, PlusCircle, MessageCircle, Heart, Moon, Sun } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
+import { useTheme } from '@/components/ThemeProvider';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -15,6 +16,7 @@ const navItems = [
 export function Navigation() {
   const breakpoint = useBreakpoint();
   const isDesktop = breakpoint === 'desktop' || breakpoint === 'wide';
+  const { theme, toggleTheme } = useTheme();
 
   if (isDesktop) {
     return (
@@ -47,7 +49,14 @@ export function Navigation() {
         </nav>
 
         <div className="p-4 border-t border-white/10">
-          <p className="text-xs text-muted-foreground text-center">
+          <button
+            onClick={toggleTheme}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 hover:bg-secondary w-full"
+          >
+            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            <span className="font-medium">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+          </button>
+          <p className="text-xs text-muted-foreground text-center mt-4">
             Hyper-local classifieds
           </p>
         </div>

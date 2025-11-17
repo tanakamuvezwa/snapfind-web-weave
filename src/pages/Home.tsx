@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../firebase';
 import { Aperture, Search, LayoutGrid, Tag, MessageSquare, Flame } from 'lucide-react';
 import '../styles/home.css';
 
 const Home: React.FC = () => {
+  const [user, loading] = useAuthState(auth);
   const [isRotating, setIsRotating] = useState(false);
   const navigate = useNavigate();
 
@@ -13,6 +16,19 @@ const Home: React.FC = () => {
       navigate('/camera');
     }, 700);
   };
+
+  if (loading) {
+    return (
+      <div className="home-container flex items-center justify-center">
+        <p className="text-foreground">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    navigate('/');
+    return null;
+  }
 
   return (
     <div className="home-container">
