@@ -3,6 +3,7 @@ import os
 import json
 from flask import Flask, request, jsonify
 from google.cloud import vision
+import google.generativeai as genai
 import numpy as np
 from PIL import Image
 import cv2
@@ -35,8 +36,39 @@ except Exception as e:
     print(f"ERROR: Could not instantiate Google Cloud Vision client: {e}")
     vision_client = None
 
+# --- Instantiate Generative AI Client ---
+try:
+    genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+    generative_model = genai.GenerativeModel('gemini-pro')
+    print("Google Generative AI client instantiated successfully.")
+except Exception as e:
+    print(f"ERROR: Could not instantiate Google Generative AI client: {e}")
+    generative_model = None
+
 # --- Flask App ---
 app = Flask(__name__)
+
+def generate_description(product_name):
+    if not generative_model:
+        return "No description available."
+    try:
+        prompt = f"Write a short, compelling product description for a {product_name}. Make it sound like a listing on a marketplace."
+        response = generative_model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        print(f"Error generating description: {e}")
+        return "No description available."
+
+def suggest_price(product_name):
+    if not generative_model:
+        return "N/A"
+    try:
+        prompt = f"What is a reasonable price for a new {product_name}? Give me a single number, no currency symbols."
+        response = generative_model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        print(f"Error suggesting price: {e}")
+        return "N/A"
 
 @app.route('/identify', methods=['POST'])
 def identify_objects():
@@ -49,51 +81,51 @@ def identify_objects():
     if filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
-    # --- 1. Search by Filename First ---
     if products_db:
-        print(f"Searching for product based on filename: {filename}")
-        # Use the new intelligent search function
         matched_product = find_product_by_query(filename, products_db)
         if matched_product:
-            print(f"Match found by filename: {matched_product['name']}")
-            # Return a response that clearly indicates it was found by filename
+            description = generate_description(matched_product['name'])
+            price = suggest_price(matched_product['name'])
             return jsonify({
                 'source': 'filename',
-                'product': matched_product
+                'product': matched_product,
+                'description': description,
+                'price': price
             })
 
-    # --- 2. Fallback to Object Detection ---
     if vision_client is None:
         return jsonify({'error': 'Google Cloud Vision client is not available.'}), 500
 
-    print("No match by filename, proceeding with object detection.")
     try:
-        # Read the image file for detection
         content = file.read()
         image = vision.Image(content=content)
 
+        response = vision_client.object_localization(image=image)
+        localized_object_annotations = response.localized_object_annotations
 
-        # Run label detection
-        response = vision_client.label_detection(image=image)
-        labels = response.label_annotations
-
-        # Process the results
-        detected_objects = []
-        for label in labels:
-            detected_objects.append(label.description)
-
-
-        # For now, let's just return a generic object detection response
-        # (You can refine this part later to match detected objects to your products_db)
-        return jsonify({
-            'source': 'object_detection',
-            'objects_detected': detected_objects
-        })
+        if localized_object_annotations:
+            main_object = localized_object_annotations[0].name
+            description = generate_description(main_object)
+            price = suggest_price(main_object)
+            
+            # For demonstration, we'll create a fake product object
+            product = {
+                "name": main_object,
+                "keywords": [main_object.lower()]
+            }
+            
+            return jsonify({
+                'source': 'object_detection',
+                'product': product,
+                'description': description,
+                'price': price
+            })
+        else:
+            return jsonify({'error': 'No objects detected'}), 404
 
     except Exception as e:
         print(f"Error during object detection: {e}")
         return jsonify({'error': f"An error occurred during image processing: {e}"}), 500
 
 if __name__ == '__main__':
-    # Make sure to run on 0.0.0.0 to be accessible from outside the Docker container
     app.run(host='0.0.0.0', port=5001)

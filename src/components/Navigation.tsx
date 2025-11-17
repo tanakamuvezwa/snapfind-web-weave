@@ -1,8 +1,10 @@
-import { Home, Camera, Search, PlusCircle, MessageCircle, Heart, Moon, Sun } from 'lucide-react';
+import { Home, Camera, Search, PlusCircle, MessageCircle, Heart, Moon, Sun, LogOut } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { useTheme } from '@/components/ThemeProvider';
 import { cn } from '@/lib/utils';
+import { auth } from "../firebase";
+import { signOut } from "firebase/auth";
 
 const navItems = [
   { to: '/home', icon: Home, label: 'Home' },
@@ -17,6 +19,10 @@ export function Navigation() {
   const breakpoint = useBreakpoint();
   const isDesktop = breakpoint === 'desktop' || breakpoint === 'wide';
   const { theme, toggleTheme } = useTheme();
+
+  const handleSignOut = () => {
+    signOut(auth);
+  };
 
   if (isDesktop) {
     return (
@@ -48,7 +54,7 @@ export function Navigation() {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-white/10">
+        <div className="p-4 border-t border-white/10 space-y-2">
           <button
             onClick={toggleTheme}
             className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 hover:bg-secondary w-full"
@@ -56,7 +62,14 @@ export function Navigation() {
             {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             <span className="font-medium">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
           </button>
-          <p className="text-xs text-muted-foreground text-center mt-4">
+          <button
+            onClick={handleSignOut}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 hover:bg-secondary w-full text-red-500"
+          >
+            <LogOut className="h-5 w-5" />
+            <span className="font-medium">Sign Out</span>
+          </button>
+          <p className="text-xs text-muted-foreground text-center pt-2">
             Hyper-local classifieds
           </p>
         </div>
@@ -89,6 +102,13 @@ export function Navigation() {
             )}
           </NavLink>
         ))}
+         <button
+            onClick={handleSignOut}
+            className='flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-300 min-w-[60px] text-muted-foreground hover:text-foreground'
+          >
+            <LogOut className={'h-6 w-6'} />
+            <span className="text-xs font-medium">Sign Out</span>
+          </button>
       </div>
     </nav>
   );
