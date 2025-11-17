@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from "./firebase.ts";
 import { Navigation } from "./components/Navigation";
+import { ThemeProvider } from "./components/ThemeProvider";
 import Welcome from "./pages/Welcome";
 import Home from "./pages/Home";
 import Camera from "./pages/Camera";
@@ -21,7 +22,7 @@ const App: React.FC = () => {
   const isDesktop = breakpoint === 'desktop' || breakpoint === 'wide';
 
   return (
-    <>
+    <ThemeProvider>
       <Navigation />
       <div className={isDesktop ? "ml-64" : ""}>
         <Routes>
@@ -37,7 +38,7 @@ const App: React.FC = () => {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Routes>
       </div>
-    </>
+    </ThemeProvider>
   );
 };
 

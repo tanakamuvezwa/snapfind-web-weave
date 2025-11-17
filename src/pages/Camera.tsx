@@ -70,10 +70,10 @@ const Camera: React.FC = () => {
           </div>
           <div className="flex flex-wrap justify-center gap-4 mt-6">
             <Button>
-                <ShoppingBag className="mr-2 h-4 w-4" /> Buy
+                <ShoppingBag className="mr-2 h-4 w-4" /> Snap to Buy
             </Button>
             <Button variant="destructive">
-                <Tag className="mr-2 h-4 w-4" /> Sale
+                <Tag className="mr-2 h-4 w-4" /> Sell
             </Button>
             <Button onClick={handleUseWebcam}>
               <CameraIcon className="mr-2 h-4 w-4" /> Use Webcam
