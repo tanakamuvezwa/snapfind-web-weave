@@ -80,6 +80,7 @@ export default function Listing() {
           location: itemLocation,
           images, // In a real app, these would be URLs from a storage service
           createdAt: serverTimestamp(),
+          status: 'active',
           // In a real app, you would add a userId here
           // userId: auth.currentUser.uid,
         };
@@ -89,7 +90,7 @@ export default function Listing() {
         console.log("Document written with ID: ", docRef.id);
         
         // Redirect after a short delay to allow toast to be seen
-        setTimeout(() => navigate('/'), 1500);
+        setTimeout(() => navigate('/tracking', { state: { newListing: { ...listingData, id: docRef.id } } }), 1500);
 
       } catch (error) {
         console.error("Error adding document: ", error);

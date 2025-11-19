@@ -1,4 +1,4 @@
-import { Home, Camera, Search, PlusCircle, MessageCircle, Heart, Moon, Sun, LogOut } from 'lucide-react';
+import { Home, Camera, Search, PlusCircle, MessageCircle, Heart, Moon, Sun, LogOut, Map, Settings } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
 import { useTheme } from '@/components/ThemeProvider';
@@ -13,6 +13,8 @@ const navItems = [
   { to: '/listing', icon: PlusCircle, label: 'List Item' },
   { to: '/chat', icon: MessageCircle, label: 'Chat' },
   { to: '/wanted', icon: Heart, label: 'Wanted' },
+  { to: '/tracking', icon: Map, label: 'Tracking' },
+  { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 
 export function Navigation() {

@@ -1,7 +1,5 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from "./firebase.ts";
 import { Navigation } from "./components/Navigation";
 import { ThemeProvider } from "./components/ThemeProvider";
 import Welcome from "./pages/Welcome";
@@ -16,12 +14,14 @@ import Wanted from "./pages/Wanted";
 import Categories from "./pages/Categories";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
-import Login from "./pages/Login";
 import PrivateRoute from "./components/PrivateRoute";
 import { useBreakpoint } from "./hooks/useBreakpoint";
+import CreatePassword from "./pages/CreatePassword";
+import Login from "./pages/Login";
+import Tracking from "./pages/Tracking";
+import Settings from "./pages/Settings";
 
 const App: React.FC = () => {
-  const [user] = useAuthState(auth);
   const breakpoint = useBreakpoint();
   const isDesktop = breakpoint === 'desktop' || breakpoint === 'wide';
 
@@ -30,7 +30,6 @@ const App: React.FC = () => {
       <Navigation />
       <div className={isDesktop ? "ml-64" : ""}>
         <Routes>
-          <Route path="/login" element={<Login />} />
           <Route
             path="/"
             element={
@@ -39,6 +38,7 @@ const App: React.FC = () => {
               </PrivateRoute>
             }
           />
+           <Route path="/login" element={<Login />} />
           <Route
             path="/home"
             element={
@@ -103,6 +103,22 @@ const App: React.FC = () => {
               </PrivateRoute>
             }
           />
+           <Route
+            path="/settings"
+            element={
+              <PrivateRoute>
+                <Settings />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/tracking"
+            element={
+              <PrivateRoute>
+                <Tracking />
+              </PrivateRoute>
+            }
+          />
           <Route
             path="/categories"
             element={
@@ -113,6 +129,7 @@ const App: React.FC = () => {
           />
           <Route path="/admin-login" element={<AdminLogin onLogin={() => {}} />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/create-password" element={<CreatePassword />} />
         </Routes>
       </div>
     </ThemeProvider>

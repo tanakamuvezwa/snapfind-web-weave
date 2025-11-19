@@ -65,12 +65,12 @@ export default function Chat() {
       setLoading(false);
       
       if (isDesktop && !selectedConversation && convos.length > 0) {
-        setSelectedConversation(convos[0]);
+        handleSelectConversation(convos[0]);
       }
     });
 
     return () => unsubscribe();
-  }, [user, isDesktop, selectedConversation]);
+  }, [user, isDesktop]);
 
   useEffect(() => {
     if (!selectedConversation) {
@@ -94,6 +94,16 @@ export default function Chat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const handleSelectConversation = async (convo: Conversation) => {
+    setSelectedConversation(convo);
+    if (user && convo.unreadCount && convo.unreadCount[user.uid] > 0) {
+      const conversationRef = doc(db, 'conversations', convo.id);
+      await updateDoc(conversationRef, {
+        [`unreadCount.${user.uid}`]: 0
+      });
+    }
+  };
+
   const handleSend = async () => {
     if (newMessage.trim() && selectedConversation && user) {
       const text = newMessage.trim();
@@ -108,9 +118,13 @@ export default function Chat() {
       await addDoc(collection(db, 'conversations', selectedConversation.id, 'messages'), messageData);
 
       const conversationRef = doc(db, 'conversations', selectedConversation.id);
+      const otherParticipantId = selectedConversation.participants.find(p => p !== user.uid);
+      const unreadCountUpdate = otherParticipantId ? { [`unreadCount.${otherParticipantId}`]: (selectedConversation.unreadCount[otherParticipantId] || 0) + 1 } : {};
+
       await updateDoc(conversationRef, {
         lastMessage: text,
         lastMessageTimestamp: serverTimestamp(),
+        ...unreadCountUpdate
       });
     }
   };
@@ -157,8 +171,9 @@ export default function Chat() {
                 </h3>
                 {companyConvos.map((conv) => {
                   const otherParticipant = getOtherParticipant(conv);
+                  const unread = user && conv.unreadCount ? conv.unreadCount[user.uid] : 0;
                   return (
-                    <button key={conv.id} onClick={() => setSelectedConversation(conv)} className={`w-full glass-card-hover p-4 flex items-center gap-3 border-l-2 ${
+                    <button key={conv.id} onClick={() => handleSelectConversation(conv)} className={`w-full glass-card-hover p-4 flex items-center gap-3 border-l-2 ${
                         selectedConversation?.id === conv.id ? 'bg-primary/20 border-primary' : 'border-transparent'
                       }`}>
                       <div className="text-3xl flex-shrink-0 relative">
@@ -170,7 +185,10 @@ export default function Chat() {
                           <h3 className="font-semibold truncate">{otherParticipant.name}</h3>
                           <span className="text-xs text-muted-foreground ml-2">{conv.lastMessageTimestamp?.toDate().toLocaleTimeString()}</span>
                         </div>
-                        <p className="text-sm text-muted-foreground truncate">{conv.lastMessage}</p>
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm text-muted-foreground truncate">{conv.lastMessage}</p>
+                          {unread > 0 && <span className='ml-2 text-xs bg-primary text-primary-foreground rounded-full px-2 py-0.5'>{unread}</span>}
+                        </div>
                       </div>
                     </button>
                   );
@@ -186,8 +204,9 @@ export default function Chat() {
                 </h3>
                 {individualConvos.map((conv) => {
                   const otherParticipant = getOtherParticipant(conv);
+                  const unread = user && conv.unreadCount ? conv.unreadCount[user.uid] : 0;
                   return (
-                    <button key={conv.id} onClick={() => setSelectedConversation(conv)} className={`w-full glass-card-hover p-4 flex items-center gap-3 border-l-2 ${
+                    <button key={conv.id} onClick={() => handleSelectConversation(conv)} className={`w-full glass-card-hover p-4 flex items-center gap-3 border-l-2 ${
                         selectedConversation?.id === conv.id ? 'bg-primary/20 border-primary' : 'border-transparent'
                       }`}>
                       <div className="text-3xl flex-shrink-0 relative">{otherParticipant.avatar}</div>
@@ -196,7 +215,10 @@ export default function Chat() {
                           <h3 className="font-semibold truncate">{otherParticipant.name}</h3>
                           <span className="text-xs text-muted-foreground ml-2">{conv.lastMessageTimestamp?.toDate().toLocaleTimeString()}</span>
                         </div>
-                        <p className="text-sm text-muted-foreground truncate">{conv.lastMessage}</p>
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm text-muted-foreground truncate">{conv.lastMessage}</p>
+                          {unread > 0 && <span className='ml-2 text-xs bg-primary text-primary-foreground rounded-full px-2 py-0.5'>{unread}</span>}
+                        </div>
                       </div>
                     </button>
                   );
@@ -210,8 +232,9 @@ export default function Chat() {
               <p className="text-center py-8 text-muted-foreground">No conversations found</p>
             ) : filteredConvos.map((conv) => {
               const otherParticipant = getOtherParticipant(conv);
+              const unread = user && conv.unreadCount ? conv.unreadCount[user.uid] : 0;
               return (
-                <button key={conv.id} onClick={() => setSelectedConversation(conv)} className={`w-full glass-card-hover p-4 flex items-center gap-3 border-l-2 ${
+                <button key={conv.id} onClick={() => handleSelectConversation(conv)} className={`w-full glass-card-hover p-4 flex items-center gap-3 border-l-2 ${
                     selectedConversation?.id === conv.id ? 'bg-primary/20 border-primary' : 'border-transparent'
                   }`}>
                   <div className="text-3xl flex-shrink-0 relative">
@@ -223,7 +246,10 @@ export default function Chat() {
                       <h3 className="font-semibold truncate">{otherParticipant.name}</h3>
                       <span className="text-xs text-muted-foreground ml-2">{conv.lastMessageTimestamp?.toDate().toLocaleTimeString()}</span>
                     </div>
-                    <p className="text-sm text-muted-foreground truncate">{conv.lastMessage}</p>
+                    <div className="flex items-center justify-between">
+                          <p className="text-sm text-muted-foreground truncate">{conv.lastMessage}</p>
+                          {unread > 0 && <span className='ml-2 text-xs bg-primary text-primary-foreground rounded-full px-2 py-0.5'>{unread}</span>}
+                    </div>
                   </div>
                 </button>
               );
